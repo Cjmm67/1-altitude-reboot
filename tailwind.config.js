@@ -8,34 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        // The cinematic private-club palette
+        // Light editorial palette.
+        // Token names preserved so component classes don't change —
+        // 'midnight' now refers to warm cream/ivory backgrounds,
+        // 'platinum' now refers to dark text colours (inverted).
         midnight: {
-          950: "#070A12",
-          900: "#0A0E1A",
-          800: "#0F1421",
-          700: "#1A1F2E",
-          600: "#252B3D",
+          950: "#FDFAF2", // warmest cream — body background
+          900: "#F8F2E4", // panels and cards
+          800: "#F0E7D0", // raised panels
+          700: "#E5DAC2", // hairline dividers (subtle on cream)
+          600: "#C9BC9C", // stronger borders / visible dividers
         },
         champagne: {
           50: "#FAF5E8",
           100: "#F0E6C8",
           200: "#E2D29A",
           300: "#D4BC75",
-          400: "#C9A961",
-          500: "#B89244",
-          600: "#967635",
-          700: "#705828",
+          400: "#B89244",  // shifted darker — needs more contrast on cream
+          500: "#967635",
+          600: "#705828",
+          700: "#4F3E1B",
         },
         platinum: {
-          50: "#FAFAFA",
-          100: "#F4F4F5",
-          200: "#E4E4E7",
-          300: "#D4D4D8",
-          400: "#A1A1AA",
-          500: "#71717A",
-          600: "#52525B",
-          700: "#3F3F46",
-          800: "#27272A",
+          50: "#1A1F2E",   // deepest text (was lightest in dark theme)
+          100: "#15192A",  // primary headings
+          200: "#26293A",  // body text
+          300: "#3F4253",  // secondary text
+          400: "#5C5F72",  // muted text
+          500: "#7C7F92",  // more muted
+          600: "#9B9DAB",  // lightest readable
+          700: "#B5B7C2",  // ghost
+          800: "#D0D1D8",  // very ghost
         },
       },
       fontFamily: {
