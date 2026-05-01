@@ -6,13 +6,13 @@ import {
 } from "@/lib/parseJSON";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-20250514";
-const MAX_TOKENS = 1500;
+const DEFAULT_MAX_TOKENS = 2000;
 
-async function callAnthropic({ systemPrompt, userMessage, useWebSearch }) {
+async function callAnthropic({ systemPrompt, userMessage, useWebSearch, maxTokens }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY environment variable not set");
@@ -20,7 +20,7 @@ async function callAnthropic({ systemPrompt, userMessage, useWebSearch }) {
 
   const body = {
     model: MODEL,
-    max_tokens: MAX_TOKENS,
+    max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],
   };
@@ -119,6 +119,7 @@ export async function POST(request) {
       systemPrompt: agent.systemPrompt,
       userMessage,
       useWebSearch: agent.useWebSearch,
+      maxTokens: agent.maxTokens,
     });
 
     const rawText = extractTextFromAnthropicResponse(data);
