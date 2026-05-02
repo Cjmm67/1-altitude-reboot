@@ -8,6 +8,7 @@ import InputsPanel from "@/components/InputsPanel";
 import AgentGrid from "@/components/AgentGrid";
 import OutputsView from "@/components/OutputsView";
 import ComparativePane from "@/components/ComparativePane";
+import IdeaViabilityPanel from "@/components/IdeaViabilityPanel";
 
 const initialAgentStates = () => {
   const obj = {};
@@ -88,6 +89,52 @@ export default function Page() {
     }
   }, [agentStates, inputs, updateAgent]);
 
+  // Stress-Tester runs on demand — independent of the main workflow.
+  // It reuses rerunAgent because the underlying API call is the same shape;
+  // it just augments inputs with userProposedIdea and gathers whatever
+  // upstream outputs happen to be available.
+  const handleRunStressTest = useCallback(async (userProposedIdea) => {
+    updateAgent("stressTester", { state: "running", error: null });
+
+    if (!abortRef.current) {
+      abortRef.current = new AbortController();
+    }
+
+    const allOutputs = {};
+    Object.entries(agentStates).forEach(([id, st]) => {
+      if (st.output) allOutputs[id] = st.output;
+    });
+
+    // Augment inputs with the user's proposed idea; if no inputs exist
+    // yet (workflow never run), pass a minimal object so the route still works.
+    const augmentedInputs = {
+      ...(inputs || {}),
+      userProposedIdea,
+    };
+
+    try {
+      const result = await rerunAgent({
+        agentId: "stressTester",
+        inputs: augmentedInputs,
+        allOutputs,
+        nudge: "",
+        signal: abortRef.current?.signal,
+      });
+      updateAgent("stressTester", {
+        state: "done",
+        output: result.output,
+        toolActivity: result.toolActivity,
+        usage: result.usage,
+        error: null,
+      });
+    } catch (err) {
+      updateAgent("stressTester", {
+        state: "error",
+        error: err.message || String(err),
+      });
+    }
+  }, [agentStates, inputs, updateAgent]);
+
   const synthesis = agentStates.synthesiser?.output;
   const conceptInventorOutput = agentStates.conceptInventor?.output;
   const auditorOutput = agentStates.differentiationAuditor?.output;
@@ -123,6 +170,13 @@ export default function Page() {
           isWorkflowRunning={isWorkflowRunning}
         />
       )}
+
+      <IdeaViabilityPanel
+        agentState={agentStates.stressTester}
+        inputs={inputs}
+        agentStates={agentStates}
+        onRunStressTest={handleRunStressTest}
+      />
 
       {concepts.length > 0 && (
         <ComparativePane concepts={concepts} killTests={killTests} />
