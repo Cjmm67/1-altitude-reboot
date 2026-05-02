@@ -73,6 +73,15 @@ function buildUserMessage({ agent, inputs, priorOutputs, nudge }) {
     lines.push("");
   }
 
+  // User-proposed idea (used by the Stress-Tester agent on demand)
+  if (inputs && inputs.userProposedIdea?.trim()) {
+    lines.push("=== USER-PROPOSED IDEA ===");
+    lines.push("The following is an idea proposed by the user. Stress-test it honestly.");
+    lines.push("");
+    lines.push(inputs.userProposedIdea.trim());
+    lines.push("");
+  }
+
   // Upstream agent outputs
   if (priorOutputs && Object.keys(priorOutputs).length > 0) {
     lines.push("=== UPSTREAM AGENT OUTPUTS YOU MUST READ AND REASON FROM ===");
